@@ -3,6 +3,7 @@ package com.example.NewsClient;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -43,12 +44,9 @@ public class LoginActivity extends AppCompatActivity {
                 while(cursor.moveToNext()){
                     ss=cursor.getString(2);
                 }
-//                //psd = password.getText().toString().trim();
-//                if(psd.equals("")){
-//                    Toast.makeText(LoginActivity.this,"kkk",Toast.LENGTH_SHORT).show();
-//                }
                 if(psd.equals(ss)){
                     Toast.makeText(LoginActivity.this,"登陆成功",Toast.LENGTH_SHORT).show();
+                    ToIntent();
                 }else{
                     Toast.makeText(LoginActivity.this,"输入的账号或密码错误",Toast.LENGTH_SHORT).show();
                 }
@@ -65,7 +63,6 @@ public class LoginActivity extends AppCompatActivity {
                 }else {
                     sqLiteDatabase=helper.getReadableDatabase();
                     ContentValues contentValues=new ContentValues();
-
                     Cursor cursor=sqLiteDatabase.query("dict",null,"username=?",new String[]{un},null,null,null);
                     String ss = "";
                     while(cursor.moveToNext()){
@@ -82,5 +79,10 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+    private void ToIntent(){
+        Intent intent = new Intent(this, HomePageActivity.class);
+        startActivity(intent);
+        //LoginActivity.this.finish();
     }
 }
