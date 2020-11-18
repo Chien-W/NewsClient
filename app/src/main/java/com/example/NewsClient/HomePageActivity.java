@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,9 +20,10 @@ import android.widget.Toast;
 
 import java.util.List;
 
-public class HomePageActivity extends AppCompatActivity {
-    private TextView textView;
+public class HomePageActivity extends Activity {
+    private DrawerLayout drawerlayout;
     private ListView listView;
+    private ImageButton imagebutton;
     private String[] name={"社会新闻","国内新闻","国际新闻","娱乐新闻","体育新闻","科技新闻","军事新闻"};
     private int[] images={R.drawable.sh,R.drawable.gn,R.drawable.gj,R.drawable.yl,R.drawable.ty,R.drawable.kj,R.drawable.js};
 
@@ -29,7 +32,8 @@ public class HomePageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_page);
         listView = findViewById(R.id.myListView);
-        textView.
+        imagebutton = findViewById(R.id.btntop);
+        drawerlayout = findViewById(R.id.drawer_layout);
         MyAdapter myAdapter=new MyAdapter();
         listView.setAdapter(myAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -41,6 +45,13 @@ public class HomePageActivity extends AppCompatActivity {
                 }
             }
         });
+        imagebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerlayout.openDrawer(Gravity.LEFT);
+            }
+        }
+        );
 
     }
 
