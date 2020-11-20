@@ -14,36 +14,45 @@
         android:layout_height="match_parent" >
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="#F5F5F5"
-            android:orientation="horizontal">
-            <ImageButton
-                android:id="@+id/btntop"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginLeft="5dp"
-                android:background="@drawable/coin"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="字节头条"
-                android:textSize="23dp"
-                android:textColor="#000000"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="10dp"/>
-
-        </LinearLayout>
-
-            <TextView
-                android:id="@+id/list_view"
-            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:dividerHeight="1dp"
+            android:orientation="vertical">
 
-            />
+            <LinearLayout
+                android:id="@+id/ll"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="#F5F5F5"
+                android:orientation="horizontal">
+                <ImageButton
+                    android:id="@+id/btntop"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:background="@drawable/coin"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="字节头条"
+                    android:textSize="23dp"
+                    android:textColor="#000000"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="10dp"/>
 
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ListView
+                    android:id="@+id/lvNews"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    />
+            </LinearLayout>
+        </LinearLayout>
     </FrameLayout>
+
     <ListView
         android:id="@+id/myListView"
         android:layout_width="180dp"
