@@ -36,6 +36,7 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
     private ImageButton imagebutton;
     private NewsAdapter newsAdapter;
     private List<Data> dataList;
+    private ImageView imageView;
     private String[] name={"社会新闻","国内新闻","国际新闻","娱乐新闻","体育新闻","科技新闻","军事新闻","财经新闻","时尚新闻"};
     private int[] images={R.drawable.sh,R.drawable.gn,R.drawable.gj,R.drawable.yl,R.drawable.ty,R.drawable.kj,R.drawable.js,R.drawable.cj,R.drawable.ss};
 
@@ -49,6 +50,7 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
         imagebutton = findViewById(R.id.btntop);
         lvNews = findViewById(R.id.lvNews);
         drawerlayout = findViewById(R.id.drawer_layout);
+        imageView = findViewById(R.id.icon_image1);
 
         init("junshi");
 
@@ -89,13 +91,24 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
                 showDrawerLayout();
             }
         });
+
+        //监听侧边栏按钮
         imagebutton.setOnClickListener(new View.OnClickListener() {//////////////////////////////////////点击后打开侧边栏
             @Override
             public void onClick(View v) {
                 drawerlayout.openDrawer(Gravity.LEFT);
             }
         });
+
+        //监听头像按钮
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("点击成功：", "点击成功");
+            }
+        });
     }
+
 
     private void init(String s){
         dataList = new ArrayList<Data>();
@@ -164,8 +177,6 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
         intent.putExtra("content_url", data.getUrl());
         startActivity(intent);
     }
-
-
 
 
     class MyAdapter extends BaseAdapter {////////////////////////////////////////////////////////////配置适配器
