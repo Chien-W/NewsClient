@@ -6,10 +6,12 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,15 +22,16 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -39,6 +42,8 @@ import com.example.NewsClient.gson.Data;
 import com.example.NewsClient.gson.News;
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +60,11 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
     private NewsAdapter newsAdapter;
     private List<Data> dataList;
     private ImageView imageView;
+    public static final int CHOOSE_PHOTO = 1;
+    public static final int TAKE_PHOTO = 2;//声明一个请求码，用于识别返回的结果
+    private ImageView picture;
+    private Uri imageUri;
+    private final String filePath = Environment.getExternalStorageDirectory() + File.separator + "output_image.jpg";
     private String[] name={"社会新闻","国内新闻","国际新闻","娱乐新闻","体育新闻","科技新闻","军事新闻","财经新闻","时尚新闻"};
     private int[] images={R.drawable.sh,R.drawable.gn,R.drawable.gj,R.drawable.yl,R.drawable.ty,R.drawable.kj,R.drawable.js,R.drawable.cj,R.drawable.ss};
 
@@ -69,6 +79,7 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
         lvNews = findViewById(R.id.lvNews);
         drawerlayout = findViewById(R.id.drawer_layout);
         imageView = findViewById(R.id.icon_image1);
+        picture = findViewById(R.id.icon_image1);
 
         init("junshi");
 
@@ -122,7 +133,9 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestPermissino();
+              //  requestPermissino();
+                drawerlayout.closeDrawer(Gravity.LEFT);
+                showBottomDialog();
                 Log.d("点击成功：", "点击成功");
             }
         });
@@ -228,9 +241,18 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
             return view;
         }
     }
-    public static final int CHOOSE_PHOTO = 2;
-    String imagePath = null;
 
+    //动态请求权限
+    private void requestPermission() {
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            //请求权限
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
+        } else {
+            //调用
+            requestCamera();
+        }
+    }
 
     private void requestPermissino() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -247,20 +269,64 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
         startActivityForResult(intent,CHOOSE_PHOTO); //打开相册
     }
 
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case 1:
-                if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    openAlbum();
-                }else {
-                    Toast.makeText(this,"你拒绝了该权限",Toast.LENGTH_SHORT).show();
+        if (grantResults != null && grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            switch (requestCode) {
+                case 1:
+                    if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                        openAlbum();
+                    }else {
+                        Toast.makeText(this,"你拒绝了该权限",Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case 2: {
+                    requestCamera();
                 }
                 break;
-            default:
-                break;
+                default:
+                    break;
+            }
         }
+    }
+
+    private void requestCamera() {
+        File outputImage = new File(filePath);
+                /*
+                创建一个File文件对象，用于存放摄像头拍下的图片，我们把这个图片命名为output_image.jpg
+                并把它存放在应用关联缓存目录下，调用getExternalCacheDir()可以得到这个目录，为什么要
+                用关联缓存目录呢？由于android6.0开始，读写sd卡列为了危险权限，使用的时候必须要有权限，
+                应用关联目录则可以跳过这一步
+                 */
+        try//判断图片是否存在，存在则删除在创建，不存在则直接创建
+        {
+            if (!outputImage.getParentFile().exists()) {
+                outputImage.getParentFile().mkdirs();
+            }
+            if (outputImage.exists()) {
+                outputImage.delete();
+            }
+
+            outputImage.createNewFile();
+
+            if (Build.VERSION.SDK_INT >= 24) {
+                imageUri = FileProvider.getUriForFile(this,
+                        "com.example.mydemo.fileprovider", outputImage);
+            } else {
+                imageUri = Uri.fromFile(outputImage);
+            }
+            //使用隐示的Intent，系统会找到与它对应的活动，即调用摄像头，并把它存储
+            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+            startActivityForResult(intent, TAKE_PHOTO);
+            //调用会返回结果的开启方式，返回成功的话，则把它显示出来
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -276,6 +342,17 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
                     }
                 }
                 break;
+            case TAKE_PHOTO:
+                if (resultCode == RESULT_OK) {
+                    try {
+                        Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
+                        picture.setImageBitmap(bitmap);
+                        //将图片解析成Bitmap对象，并把它显现出来
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
             default:
                 break;
         }
@@ -283,6 +360,7 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void handleImageOnKitKat(Intent data){
+        String imagePath = null;
         Uri uri = data.getData();
         if(DocumentsContract.isDocumentUri(this,uri)){
             //如果是document类型的Uri，则通过document id处理
@@ -343,4 +421,57 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
         String beforeImagePath = sp.getString("imgPath", null);
         displayImage(beforeImagePath);
     }
+
+    private void showBottomDialog(){
+        //1、使用Dialog、设置style
+        final Dialog dialog = new Dialog(this,R.style.DialogTheme);
+        //2、设置布局
+        View view = View.inflate(this,R.layout.dialog_custom_layout,null);
+        dialog.setContentView(view);
+
+        Window window = dialog.getWindow();
+        //设置弹出位置
+        window.setGravity(Gravity.BOTTOM);
+        //设置弹出动画
+        window.setWindowAnimations(R.style.main_menu_animStyle);
+        //设置对话框大小
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.show();
+
+        dialog.findViewById(R.id.tv_take_photo).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                requestPermission();
+                drawerlayout.openDrawer(Gravity.LEFT);
+            }
+        });
+
+        dialog.findViewById(R.id.tv_take_pic).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                requestPermissino();
+                drawerlayout.openDrawer(Gravity.LEFT);
+            }
+        });
+
+        dialog.findViewById(R.id.tv_cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+    }
+
+    //设置保存拍照图片——>再次关闭app重新打开显示为上次拍照照片
+    private void setDefualtImage() {
+        File outputImage = new File(filePath);
+        if (!outputImage.exists()) {
+            return;
+        }
+        picture.setImageBitmap(BitmapFactory.decodeFile(filePath));
+    }
+
 }
