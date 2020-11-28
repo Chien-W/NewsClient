@@ -166,7 +166,7 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
                 try {
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
-                            .url("https://www.oyyandwjw.xyz/xw.json")
+                            .url("https://www.oyyandwjw.xyz/news/"+part+".json")
                             .build();
                     Response response = null;
                     response = client.newCall(request).execute();
