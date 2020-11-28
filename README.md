@@ -56,11 +56,15 @@
 
 **1、数据流程图**
 
-![](https://gitee.com/Chien_W/pitcture/blob/master/%E6%95%B0%E6%8D%AE%E6%B5%81%E7%A8%8B%E5%9B%BE.png)      
+ ![](https://gitee.com/Chien_W/pitcture/blob/master/%E6%95%B0%E6%8D%AE%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
+
+
 
 **2、数据库概念结构设计**
 
 ![](https://gitee.com/Chien_W/pitcture/blob/master/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B5%E7%BB%93%E6%9E%84%E8%AE%BE%E8%AE%A1.png)
+
+
 
 数据表:username为账号，password为密码。
 
