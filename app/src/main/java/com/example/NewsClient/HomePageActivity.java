@@ -133,7 +133,7 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              //  requestPermissino();
+                requestPermissino();
                 drawerlayout.closeDrawer(Gravity.LEFT);
                 showBottomDialog();
                 Log.d("点击成功：", "点击成功");
@@ -166,7 +166,7 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
                 try {
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
-                            .url("https://www.oyyandwjw.xyz/xw.json")
+                            .url("http://v.juhe.cn/toutiao/index?type="+part+"&key=a022eb1dafc57af1e06a19a29a61456a")
                             .build();
                     Response response = null;
                     response = client.newCall(request).execute();
@@ -207,6 +207,7 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
         Data data = dataList.get(position);
         Intent intent = new Intent(this, BrowseNewsActivity.class);
         intent.putExtra("content_url", data.getUrl());
+        System.out.println(data.getUrl());
         startActivity(intent);
     }
 
@@ -419,7 +420,7 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
         SharedPreferences sp = getSharedPreferences("sp_img", MODE_PRIVATE);
         //取出上次存储的图片路径设置此次的图片展示
         String beforeImagePath = sp.getString("imgPath", null);
-        displayImage(beforeImagePath);
+        //displayImage(beforeImagePath);
     }
 
     private void showBottomDialog(){
