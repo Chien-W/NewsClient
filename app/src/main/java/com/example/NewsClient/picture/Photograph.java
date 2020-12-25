@@ -1,5 +1,10 @@
 package com.example.NewsClient.picture;
-
+/**
+ * @description: 使用相机拍照更改头像
+ * @author Chien_W
+ * @date 2020/12/25 14:52
+ * @version 1.0
+ */
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
