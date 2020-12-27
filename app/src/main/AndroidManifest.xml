@@ -26,7 +26,6 @@
         android:usesCleartextTraffic="true">
         <activity android:name=".picture.Photograph"></activity>
         <activity android:name=".picture.Photo" />
-        <activity android:name=".picture.photo" />
 
         <meta-data
             android:name="com.google.android.actions"

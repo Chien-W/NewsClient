@@ -1,6 +1,7 @@
 package com.example.NewsClient;
 
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -10,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -22,6 +24,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.NewsClient.adapter.MyAdapter;
+import com.example.NewsClient.adapter.NewsAdapter;
 import com.example.NewsClient.gson.Data;
 import com.example.NewsClient.gson.News;
 import com.example.NewsClient.picture.Photo;
@@ -43,10 +47,11 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
     private ListView lvNews;
     private ImageButton imagebutton;
     private NewsAdapter newsAdapter;
+    private MyAdapter myAdapter;
     private List<Data> dataList;
     private ImageView imageView;
-    private String[] name = {"社会新闻", "国内新闻", "国际新闻", "娱乐新闻", "体育新闻", "科技新闻", "军事新闻", "财经新闻", "时尚新闻"};
-    private int[] images = {R.drawable.sh, R.drawable.gn, R.drawable.gj, R.drawable.yl, R.drawable.ty, R.drawable.kj, R.drawable.js, R.drawable.cj, R.drawable.ss};
+    private SwipeRefreshLayout swipe;
+    private String page;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,13 +61,26 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
         myListView = findViewById(R.id.myListView);
         lvNews = findViewById(R.id.lvNews);
         imagebutton = findViewById(R.id.btntop);
-        lvNews = findViewById(R.id.lvNews);
         drawerlayout = findViewById(R.id.drawer_layout);
         imageView = findViewById(R.id.icon_image1);
+        swipe = findViewById(R.id.swipe);
+        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {// 刷新
+            @Override
+            public void onRefresh() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        init(page);
+                        swipe.setRefreshing(false);
+                    }
+                },3000);
+            }
+        });
 
-        init("junshi");
+        init("shehui");
+        page = "shehui";
 
-        MyAdapter myAdapter = new MyAdapter();
+        myAdapter = new MyAdapter(HomePageActivity.this);
         myListView.setAdapter(myAdapter);
         myListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -70,30 +88,39 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
                 switch (position) {
                     case 0:
                         init("shehui");
+                        page = "shehui";
                         break;
                     case 1:
                         init("guonei");
+                        page = "guonei";
                         break;
                     case 2:
                         init("guoji");
+                        page = "guoji";
                         break;
                     case 3:
                         init("yule");
+                        page = "yule";
                         break;
                     case 4:
                         init("tiyu");
+                        page = "tiyu";
                         break;
                     case 5:
-                        init("junshi");
+                        init("keji");
+                        page = "keji";
                         break;
                     case 6:
-                        init("keji");
+                        init("junshi");
+                        page = "junshi";
                         break;
                     case 7:
                         init("caijing");
+                        page = "caijing";
                         break;
                     case 8:
                         init("shishang");
+                        page = "shishang";
                         break;
                 }
                 showDrawerLayout();
@@ -101,7 +128,7 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
         });
 
         //监听侧边栏按钮
-        imagebutton.setOnClickListener(new View.OnClickListener() {//////////////////////////////////////点击后打开侧边栏
+        imagebutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 drawerlayout.openDrawer(Gravity.LEFT);
@@ -143,7 +170,7 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
                 Bitmap bitmap = BitmapFactory.decodeFile(imageurl);
                 imageView.setImageBitmap(bitmap);
                 //存储上次选择的图片路径，用以再次打开app设置图片
-                SharedPreferences sp = getSharedPreferences("sp_img",MODE_PRIVATE);  //创建xml文件存储数据，name:创建的xml文件名
+                SharedPreferences sp = getSharedPreferences("sp_img",MODE_PRIVATE);  // 创建xml文件存储数据，name:创建的xml文件名
                 SharedPreferences.Editor editor = sp.edit(); //获取edit()
                 editor.putString("imgPath",imageurl);
                 editor.apply();
@@ -154,15 +181,20 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
 
 
     private void init(String s) {
-        dataList = new ArrayList<Data>();
+        dataList = new ArrayList<>();
         newsAdapter = new NewsAdapter(HomePageActivity.this, dataList);
         lvNews.setAdapter(newsAdapter);
         lvNews.setOnItemClickListener(this);
         sendRequestWithOKHttp(s);
     }
+//    private void initd(String s) {
+//        List<Data> list = new ArrayList<>();
+//        newsAdapter.setList(list);
+//        lvNews.setOnItemClickListener(this);
+//        sendRequestWithOKHttp(s);
+//    }
 
-
-    private void showDrawerLayout() {////////////////////////////////////////////////////////////////////点击后关闭侧边栏
+    private void showDrawerLayout() {// 点击后关闭侧边栏
         if (!drawerlayout.isDrawerOpen(Gravity.LEFT)) {
             drawerlayout.openDrawer(Gravity.LEFT);
         } else {
@@ -177,7 +209,7 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
                 try {
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
-                            .url("http://v.juhe.cn/toutiao/index?type=" + part + "&key=6d18e308b859813f01a7d229f0592f19")
+                            .url("http://v.juhe.cn/toutiao/index?type=" + part + "&key=a022eb1dafc57af1e06a19a29a61456a")
                             .build();
                     Response response = null;
                     response = client.newCall(request).execute();
@@ -191,7 +223,7 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
         }).start();
     }
 
-    private void parseJsonWithGson(String jsonData) {//////////////////////////////////////////////////获取
+    private void parseJsonWithGson(String jsonData) {// 获取
         Gson gson = new Gson();
         News news = gson.fromJson(jsonData, News.class);
         List<Data> list = news.getResult().getData();
@@ -205,16 +237,17 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
             String pic_url = list.get(i).getThumbnail_pic_s();
             dataList.add(new Data(uniquekey, title, date, category, author_name, content_url, pic_url));
         }
-        runOnUiThread(new Runnable() {/////更新Adapter(务必在主线程中更新UI!!!)
+        runOnUiThread(new Runnable() {// 更新Adapter(务必在主线程中更新UI!!!)
             @Override
             public void run() {
+                Log.d("test：", "刷新页面");
                 newsAdapter.notifyDataSetChanged();
             }
         });
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {///////////////点击查看新闻
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {// 点击查看新闻
         Data data = dataList.get(position);
         Intent intent = new Intent(this, BrowseNewsActivity.class);
         intent.putExtra("content_url", data.getUrl());
@@ -222,38 +255,6 @@ public class HomePageActivity extends Activity implements AdapterView.OnItemClic
         startActivity(intent);
     }
 
-
-    class MyAdapter extends BaseAdapter {////////////////////////////////////////////////////////////配置适配器
-
-        @Override
-        public int getCount() {
-            return name.length;
-        }
-
-        public MyAdapter() {
-            super();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return name[position];
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = View.inflate(HomePageActivity.this, R.layout.fg_content, null);
-            ImageView image = view.findViewById(R.id.item_image);
-            TextView text = view.findViewById(R.id.item_text);
-            image.setBackgroundResource(images[position]);
-            text.setText(name[position]);
-            return view;
-        }
-    }
 
     private void showBottomDialog() {
         //1、使用Dialog、设置style
