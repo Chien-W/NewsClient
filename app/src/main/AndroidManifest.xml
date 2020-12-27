@@ -14,20 +14,24 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-
     <application
-        android:networkSecurityConfig="@xml/network_config"
         android:allowBackup="true"
         android:icon="@drawable/newafter"
         android:label="今日头条"
+        android:networkSecurityConfig="@xml/network_config"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NewsClient"
-        android:usesCleartextTraffic="true"
-        android:requestLegacyExternalStorage="true">
+        android:usesCleartextTraffic="true">
+        <activity android:name=".picture.Photograph"></activity>
+        <activity android:name=".picture.Photo" />
+        <activity android:name=".picture.photo" />
+
         <meta-data
             android:name="com.google.android.actions"
             android:resource="@xml/network_config" />
+
         <activity android:name=".BrowseNewsActivity" />
         <activity android:name=".HomePageActivity" />
         <activity android:name=".LoginActivity" />
@@ -41,9 +45,7 @@
 
         <uses-library
             android:name="org.apache.http.legacy"
-            android:required="false" />
-
-        <!-- 为调用相机拍照设置内容提供者 -->
+            android:required="false" /> <!-- 为调用相机拍照设置内容提供者 -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.mydemo.fileprovider"
