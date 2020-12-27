@@ -1,4 +1,4 @@
-package com.example.NewsClient;
+package com.example.NewsClient.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,11 +11,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.example.NewsClient.R;
 import com.example.NewsClient.gson.Data;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 public class NewsAdapter extends BaseAdapter {
@@ -28,6 +30,10 @@ public class NewsAdapter extends BaseAdapter {
     public NewsAdapter(Context context, List<Data> dataList){
         this.context = context;
         this.dataList = dataList;
+    }
+
+    public void setList(List<Data> list){
+        this.dataList = list;
     }
 
     //控制该Adapter包含列表项的个数

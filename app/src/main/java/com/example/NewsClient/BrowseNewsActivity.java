@@ -31,8 +31,6 @@ public class BrowseNewsActivity extends AppCompatActivity {
                 handler.proceed();
             }
         });
-
-
         webView.loadUrl(pic_url);
     }
 }
